@@ -15,7 +15,24 @@ const projectSchema = z.object({
   title: z.string().trim().min(1, "Title is required").max(100, "Title too long"),
   description: z.string().trim().min(1, "Description is required").max(500, "Description too long"),
   technologies: z.string().trim().min(1, "Technologies are required"),
+  category: z.string().optional(), // Make category optional
 });
+
+const PROJECT_CATEGORIES = [
+  "Web Development",
+  "Mobile App",
+  "Machine Learning",
+  "Data Science",
+  "AI/ML",
+  "Blockchain",
+  "Game Development",
+  "Desktop Application",
+  "DevOps/Cloud",
+  "Cybersecurity",
+  "IoT",
+  "E-commerce",
+  "Other"
+];
 
 export default function ProjectForm() {
   const { id } = useParams();
@@ -30,12 +47,26 @@ export default function ProjectForm() {
   const [technologies, setTechnologies] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [published, setPublished] = useState(false);
+  const [category, setCategory] = useState("Web Development");
 
   useEffect(() => {
+    checkAuth();
     if (isEditing) {
       fetchProject();
     }
   }, [id]);
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast({
+        variant: "destructive",
+        title: "Unauthorized",
+        description: "Please login to access this page.",
+      });
+      navigate('/admin/login');
+    }
+  };
 
   const fetchProject = async () => {
     try {
@@ -52,7 +83,12 @@ export default function ProjectForm() {
       setTechnologies(Array.isArray(data.technologies) ? data.technologies.join(', ') : '');
       setImageUrl(data.image_url || '');
       setPublished(data.published);
+      // Only set category if it exists in the data
+      if (data.category) {
+        setCategory(data.category);
+      }
     } catch (error: any) {
+      console.error('Fetch project error:', error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -126,6 +162,7 @@ export default function ProjectForm() {
       title,
       description,
       technologies,
+      category,
     });
 
     if (!validation.success) {
@@ -150,6 +187,7 @@ export default function ProjectForm() {
         technologies: techArray,
         image_url: imageUrl || null,
         published,
+        ...(category && { category }), // Only include category if it exists
       };
 
       if (isEditing) {
@@ -173,10 +211,11 @@ export default function ProjectForm() {
       });
       navigate('/admin/dashboard');
     } catch (error: any) {
+      console.error('Project creation error:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: `Failed to ${isEditing ? 'update' : 'create'} project.`,
+        description: error.message || `Failed to ${isEditing ? 'update' : 'create'} project.`,
       });
     } finally {
       setLoading(false);
@@ -233,6 +272,26 @@ export default function ProjectForm() {
                 />
                 <p className="text-xs text-muted-foreground">
                   {description.length}/500 characters
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="category">Project Category</Label>
+                <select
+                  id="category"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 bg-input border border-border rounded-md text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  {PROJECT_CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-muted-foreground">
+                  Select the primary domain/category for this project
                 </p>
               </div>
 

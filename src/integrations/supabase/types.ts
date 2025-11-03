@@ -24,6 +24,7 @@ export type Database = {
           technologies: Json
           title: string
           updated_at: string | null
+          category: string
         }
         Insert: {
           created_at?: string | null
@@ -34,6 +35,7 @@ export type Database = {
           technologies?: Json
           title: string
           updated_at?: string | null
+          category?: string
         }
         Update: {
           created_at?: string | null
@@ -44,6 +46,7 @@ export type Database = {
           technologies?: Json
           title?: string
           updated_at?: string | null
+          category?: string
         }
         Relationships: []
       }
