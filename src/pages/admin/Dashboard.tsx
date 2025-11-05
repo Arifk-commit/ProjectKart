@@ -26,6 +26,7 @@ interface Project {
   published: boolean;
   created_at: string;
   category?: string; // Make optional
+  display_order?: number;
 }
 
 export default function Dashboard() {
@@ -57,6 +58,7 @@ export default function Dashboard() {
       const { data, error } = await supabase
         .from('projects')
         .select('*')
+        .order('display_order', { ascending: true })
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -69,6 +71,7 @@ export default function Dashboard() {
         published: project.published,
         created_at: project.created_at,
         category: project.category || 'Web Development',
+        display_order: project.display_order || 0,
       })));
     } catch (error: any) {
       toast({
@@ -213,11 +216,18 @@ export default function Dashboard() {
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <CardTitle className="text-foreground">{project.title}</CardTitle>
-                      {project.category && (
-                        <Badge variant="outline" className="mt-2 text-xs">
-                          {project.category}
-                        </Badge>
-                      )}
+                      <div className="flex gap-2 mt-2">
+                        {project.category && (
+                          <Badge variant="outline" className="text-xs">
+                            {project.category}
+                          </Badge>
+                        )}
+                        {project.display_order !== undefined && project.display_order > 0 && (
+                          <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-300">
+                            Priority: {project.display_order}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                     <Badge 
                       variant={project.published ? "default" : "secondary"}
