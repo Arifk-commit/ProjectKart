@@ -174,7 +174,7 @@ export default function ProjectDetails() {
             className="text-black hover:bg-white/50 text-sm sm:text-base"
           >
             <span className="hidden sm:inline">Browse All Projects</span>
-            <span className="sm:hidden">Projects</span>
+            <span className="sm:hidden">All Projects</span>
           </Button>
         </div>
 

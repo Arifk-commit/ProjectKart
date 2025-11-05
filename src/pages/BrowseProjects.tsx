@@ -3,9 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProjectCard } from "@/components/ProjectCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Search } from "lucide-react";
+import { ArrowLeft, Search, Menu, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 interface Project {
   id: string;
@@ -40,6 +41,7 @@ export default function BrowseProjects() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -124,25 +126,93 @@ export default function BrowseProjects() {
       {/* Header */}
       <header className="bg-white/10 backdrop-blur-md border-b border-white/20">
         <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
-          {/* Top Row: Logo, Title, Search, Home Button */}
-          <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
-            {/* Logo and Title */}
-            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-              <img src="/logo-black.svg" alt="ProjectKart" className="h-6 w-6 sm:h-8 sm:w-8 brightness-0 invert" />
-              <span className="text-white font-bold text-sm sm:text-lg">ProjectKart</span>
-            </div>
-            
-            {/* Search Bar */}
-            <div className="flex-1 max-w-md mx-auto">
-              <div className="relative w-full">
-                <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-white/60 flex-shrink-0" />
-                <Input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 text-xs sm:text-sm bg-white/20 backdrop-blur-sm border-white/30 text-white placeholder:text-white/60 focus:bg-white/30 focus:border-white/50 focus:ring-white/30 rounded-full"
-                />
+          {/* Top Row: Menu, Logo, Title, and Home Button */}
+          <div className="flex items-center justify-between gap-2 sm:gap-4 mb-3">
+            {/* Left side: Menu button (mobile only) + Logo and Title */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Mobile Menu Button */}
+              <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="sm:hidden text-white hover:bg-white/20 p-1.5 h-auto relative"
+                  >
+                    <Menu className="h-5 w-5" />
+                    {selectedCategories.length > 0 && (
+                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold">
+                        {selectedCategories.length}
+                      </span>
+                    )}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-[280px] bg-gradient-to-br from-[#1a4d8f] via-[#2563eb] to-[#0ea5e9] border-white/20">
+                  <SheetHeader>
+                    <SheetTitle className="text-white text-left">Filter by Category</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-6 space-y-2">
+                    {/* Clear All Button */}
+                    {selectedCategories.length > 0 && (
+                      <button
+                        onClick={() => {
+                          setSelectedCategories([]);
+                          setSidebarOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-all flex items-center justify-between"
+                      >
+                        <span>Clear All Filters</span>
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                    
+                    {/* Category List */}
+                    {PROJECT_CATEGORIES.filter(cat => cat !== "All Categories").map((cat) => {
+                      const isSelected = selectedCategories.includes(cat);
+                      return (
+                        <button
+                          key={cat}
+                          onClick={() => {
+                            if (isSelected) {
+                              setSelectedCategories(selectedCategories.filter(c => c !== cat));
+                            } else {
+                              setSelectedCategories([...selectedCategories, cat]);
+                            }
+                          }}
+                          className={`w-full text-left px-4 py-2.5 text-sm rounded-lg transition-all ${
+                            isSelected
+                              ? 'bg-white text-blue-600 font-medium shadow-lg'
+                              : 'text-white hover:bg-white/20'
+                          }`}
+                        >
+                          {cat}
+                          {isSelected && <span className="ml-2">✓</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  
+                  {/* Apply Filters Button */}
+                  <div className="mt-6 pt-4 border-t border-white/20 space-y-3">
+                    {selectedCategories.length > 0 && (
+                      <p className="text-xs text-white/60 text-center">
+                        {selectedCategories.length} {selectedCategories.length === 1 ? 'category' : 'categories'} selected
+                      </p>
+                    )}
+                    <Button
+                      onClick={() => setSidebarOpen(false)}
+                      className="w-full bg-white text-blue-600 hover:bg-white/90 font-semibold py-5 rounded-xl shadow-lg"
+                    >
+                      <Search className="mr-2 h-4 w-4" />
+                      Apply Filters & Search
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+
+              {/* Logo and Title */}
+              <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                <img src="/logo-black.svg" alt="ProjectKart" className="h-6 w-6 sm:h-8 sm:w-8 brightness-0 invert" />
+                <span className="text-white font-bold text-sm sm:text-lg">ProjectKart</span>
               </div>
             </div>
             
@@ -161,8 +231,22 @@ export default function BrowseProjects() {
             </Button>
           </div>
 
-          {/* Bottom Row: Category Filters */}
-          <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-white/10">
+          {/* Search Bar Row - Full width on mobile */}
+          <div className="mb-3 sm:mb-4">
+            <div className="relative w-full sm:max-w-md sm:mx-auto">
+              <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-white/60 flex-shrink-0" />
+              <Input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 text-xs sm:text-sm bg-white/20 backdrop-blur-sm border-white/30 text-white placeholder:text-white/60 focus:bg-white/30 focus:border-white/50 focus:ring-white/30 rounded-full"
+              />
+            </div>
+          </div>
+
+          {/* Bottom Row: Category Filters (Desktop only) */}
+          <div className="hidden sm:block pt-3 sm:pt-4 border-t border-white/10">
             <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
               <span className="text-white font-semibold text-xs sm:text-sm">Filter by Category</span>
               {selectedCategories.length > 0 && (
@@ -213,7 +297,7 @@ export default function BrowseProjects() {
       </header>
 
       {/* Projects Grid */}
-      <section className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-8">
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
         {loading ? (
           <div className="text-center text-white py-12 sm:py-16 lg:py-20">
             <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-white mx-auto mb-3 sm:mb-4"></div>
@@ -235,12 +319,12 @@ export default function BrowseProjects() {
           </div>
         ) : (
           <>
-            <div className="mb-3 sm:mb-4 text-white/90 text-xs sm:text-sm text-center md:text-left px-1">
+            <div className="mb-4 sm:mb-6 text-white/90 text-xs sm:text-sm text-center md:text-left px-1">
               {filteredProjects.length} {filteredProjects.length === 1 ? 'project' : 'projects'}
               {selectedCategories.length > 0 && ` in ${selectedCategories.join(', ')}`}
               {searchQuery && ` matching "${searchQuery}"`}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8">
               {filteredProjects.map((project) => (
                 <ProjectCard
                   key={project.id}

@@ -128,7 +128,7 @@ export default function Portfolio() {
               isScrolled ? 'text-gray-900' : 'text-white'
             }`}>ProjectKart</span>
           </div>
-          <div className="flex gap-6">
+          {/* <div className="flex gap-6">
             <button 
               onClick={() => {
                 navigate('/');
@@ -148,7 +148,7 @@ export default function Portfolio() {
             >
               Browse Projects
             </button>
-          </div>
+          </div> */}
           <div className="w-10"></div>
         </div>
       </header>
@@ -208,13 +208,13 @@ export default function Portfolio() {
       </section>
 
       {/* Projects Grid Section */}
-      <section id="projects-section" className="relative z-10 bg-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">
+      <section id="projects-section" className="relative z-10 bg-white py-12 sm:py-16 md:py-20 overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-7xl">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
               Featured Projects
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
               Explore our portfolio of innovative solutions ready to deploy
             </p>
           </div>
@@ -228,28 +228,29 @@ export default function Portfolio() {
             </div>
           ) : (
             <>
-              {/* Mobile: Show 3 projects, Desktop: Show 6 projects */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+              {/* Responsive Grid: Mobile 1 col, Tablet 2 cols, Desktop 3 cols */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-10 sm:mb-12 w-full max-w-full">
                 {projects.slice(0, 6).map((project, index) => (
-                  <ProjectCard
-                    key={project.id}
-                    id={project.id}
-                    title={project.title}
-                    description={project.description}
-                    technologies={project.technologies}
-                    imageUrl={project.image_url}
-                    whatsappNumber={whatsappNumber}
-                    className={index >= 3 ? 'hidden md:block' : ''}
-                  />
+                  <div key={project.id} className={`${index >= 3 ? 'hidden sm:block' : ''} w-full max-w-full`}>
+                    <ProjectCard
+                      id={project.id}
+                      title={project.title}
+                      description={project.description}
+                      technologies={project.technologies}
+                      imageUrl={project.image_url}
+                      whatsappNumber={whatsappNumber}
+                      className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 border border-blue-100 shadow-lg"
+                    />
+                  </div>
                 ))}
               </div>
               
               {projects.length > 3 && (
-                <div className="text-center">
+                <div className="text-center pt-4 sm:pt-6">
                   <Button
                     onClick={() => navigate('/browse-projects')}
                     size="lg"
-                    className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:from-blue-700 hover:to-cyan-600"
+                    className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:from-blue-700 hover:to-cyan-600 shadow-lg hover:shadow-xl transition-all px-6 sm:px-8 py-5 sm:py-6 text-sm sm:text-base"
                   >
                     View All Projects
                   </Button>
