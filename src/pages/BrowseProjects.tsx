@@ -14,7 +14,10 @@ interface Project {
   description: string;
   technologies: string[];
   image_url?: string;
-  category?: string; // Make optional
+  category?: string;
+  price?: number;
+  min_price?: number;
+  max_price?: number;
 }
 
 const PROJECT_CATEGORIES = [
@@ -74,6 +77,13 @@ export default function BrowseProjects() {
     setFilteredProjects(filtered);
   }, [searchQuery, selectedCategories, projects]);
 
+  const handleContactClick = () => {
+    const phoneNumber = "919137106851"; // Your WhatsApp number with country code
+    const message = encodeURIComponent("Hello, I'd like to discuss a project with you!");
+    const url = `https://wa.me/${phoneNumber}?text=${message}`;
+    window.open(url, '_blank');
+  };
+
   const fetchProjects = async () => {
     try {
       const { data, error } = await supabase
@@ -91,6 +101,9 @@ export default function BrowseProjects() {
         technologies: Array.isArray(project.technologies) ? project.technologies.map(String) : [],
         image_url: project.image_url,
         category: project.category || 'Web Development',
+        price: project.price || 0,
+        min_price: project.min_price || 0,
+        max_price: project.max_price || 0,
       }));
       setProjects(mappedProjects);
       setFilteredProjects(mappedProjects);
@@ -122,9 +135,9 @@ export default function BrowseProjects() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a4d8f] via-[#2563eb] to-[#0ea5e9]">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white/10 backdrop-blur-md border-b border-white/20">
+      <header className="bg-gradient-to-br from-[#1a4d8f] via-[#2563eb] to-[#0ea5e9] border-b border-white/20">
         <div className="container mx-auto px-4 sm:px-4 py-4 sm:py-4">
           {/* Desktop: Single Row with Logo, Search, Home */}
           {/* Mobile: Logo & Home on first row, Search on second row */}
@@ -214,7 +227,7 @@ export default function BrowseProjects() {
 
               {/* Logo and Title */}
               <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                <img src="/logo-black.svg" alt="ProjectKart" className="h-8 w-8 sm:h-8 sm:w-8 brightness-0 invert" />
+                <img src="/logo-white.svg" alt="ProjectKart" className="h-8 w-8 sm:h-8 sm:w-8" />
                 <span className="text-white font-bold text-base sm:text-lg">ProjectKart</span>
               </div>
             </div>
@@ -295,13 +308,13 @@ export default function BrowseProjects() {
                     }}
                     className={`px-3 sm:px-3 md:px-4 py-2 sm:py-2 text-xs sm:text-sm font-medium rounded-lg transition-all relative touch-manipulation ${
                       isSelected
-                        ? 'bg-white text-blue-600 shadow-lg scale-105'
-                        : 'bg-white/20 text-white hover:bg-white/30 hover:scale-105'
+                        ? 'bg-blue-600 text-white shadow-lg scale-105'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
                     }`}
                   >
                     <span className="line-clamp-2 sm:line-clamp-1">{cat}</span>
                     {isSelected && (
-                      <span className="absolute -top-0.5 sm:-top-1 -right-0.5 sm:-right-1 w-4 h-4 sm:w-4 sm:h-4 bg-blue-600 rounded-full flex items-center justify-center text-white text-[10px] sm:text-[11px]">
+                      <span className="absolute -top-0.5 sm:-top-1 -right-0.5 sm:-right-1 w-4 h-4 sm:w-4 sm:h-4 bg-white rounded-full flex items-center justify-center text-blue-600 text-[10px] sm:text-[11px] font-bold">
                         ✓
                       </span>
                     )}
@@ -316,19 +329,19 @@ export default function BrowseProjects() {
       {/* Projects Grid */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
         {loading ? (
-          <div className="text-center text-white py-12 sm:py-16 lg:py-20">
-            <div className="animate-spin rounded-full h-12 w-12 sm:h-14 sm:w-14 border-b-2 border-white mx-auto mb-4 sm:mb-5"></div>
+          <div className="text-center text-gray-900 py-12 sm:py-16 lg:py-20">
+            <div className="animate-spin rounded-full h-12 w-12 sm:h-14 sm:w-14 border-b-2 border-blue-600 mx-auto mb-4 sm:mb-5"></div>
             <p className="text-base sm:text-lg">Loading projects...</p>
           </div>
         ) : filteredProjects.length === 0 ? (
           <div className="text-center py-12 sm:py-16 lg:py-20 px-4">
-            <div className="text-white mb-4 sm:mb-5 text-lg sm:text-xl">
+            <div className="text-gray-900 mb-4 sm:mb-5 text-lg sm:text-xl">
               {searchQuery ? `No projects found for "${searchQuery}"` : "No projects available yet."}
             </div>
             {searchQuery && (
               <Button
                 onClick={() => setSearchQuery("")}
-                className="mt-4 bg-white text-blue-600 hover:bg-white/90 text-base sm:text-lg px-6 py-3"
+                className="mt-4 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-xl text-base sm:text-lg px-6 py-3"
               >
                 Clear Search
               </Button>
@@ -336,7 +349,7 @@ export default function BrowseProjects() {
           </div>
         ) : (
           <>
-            <div className="mb-5 sm:mb-6 text-white/90 text-sm sm:text-base text-center md:text-left px-1">
+            <div className="mb-5 sm:mb-6 text-gray-600 text-sm sm:text-base text-center md:text-left px-1">
               {filteredProjects.length} {filteredProjects.length === 1 ? 'project' : 'projects'}
               {selectedCategories.length > 0 && ` in ${selectedCategories.join(', ')}`}
               {searchQuery && ` matching "${searchQuery}"`}
@@ -351,6 +364,9 @@ export default function BrowseProjects() {
                   technologies={project.technologies}
                   imageUrl={project.image_url}
                   whatsappNumber={whatsappNumber}
+                  price={project.price}
+                  minPrice={project.min_price}
+                  maxPrice={project.max_price}
                 />
               ))}
             </div>
@@ -359,76 +375,40 @@ export default function BrowseProjects() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900/50 backdrop-blur-md border-t border-white/10 py-8 sm:py-10 lg:py-12 mt-12 sm:mt-16 lg:mt-20">
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8">
-            {/* Brand */}
+      <footer className="relative z-10 bg-gray-900 border-t border-gray-800 py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>
-              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <img src="/logo-black.svg" alt="ProjectKart" className="h-9 w-9 sm:h-10 sm:w-10 brightness-0 invert" />
-                <span className="text-white font-bold text-lg sm:text-xl">ProjectKart</span>
+              <div className="flex items-center gap-3 mb-4">
+                <img src="/logo-white.svg" alt="ProjectKart Logo" className="h-10 w-10" />
+                <span className="text-white font-bold text-xl">ProjectKart</span>
               </div>
-              <p className="text-white/70 text-sm sm:text-base leading-relaxed">
+              <p className="text-gray-400">
                 Professional ready-made projects and custom solutions for your business needs.
               </p>
             </div>
-
-            {/* Quick Links */}
             <div>
-              <h3 className="text-white font-semibold mb-3 sm:mb-4 text-base sm:text-lg">Quick Links</h3>
-              <ul className="space-y-2 sm:space-y-2.5">
-                <li>
-                  <button 
-                    onClick={() => navigate('/')} 
-                    className="text-white/70 hover:text-white transition-colors text-sm sm:text-base"
-                  >
-                    Home
-                  </button>
-                </li>
-                <li>
-                  <button 
-                    onClick={() => navigate('/browse-projects')} 
-                    className="text-white/70 hover:text-white transition-colors text-sm sm:text-base"
-                  >
-                    Browse Projects
-                  </button>
-                </li>
-                <li>
-                  <button 
-                    onClick={() => {
-                      const phoneNumber = "919137106851";
-                      const message = encodeURIComponent("Hello, I'd like to discuss a project with you!");
-                      window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
-                    }}
-                    className="text-white/70 hover:text-white transition-colors text-sm sm:text-base"
-                  >
-                    Contact Us
-                  </button>
-                </li>
+              <h3 className="text-white font-semibold mb-4">Quick Links</h3>
+              <ul className="space-y-2">
+                <li><button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-colors">Home</button></li>
+                <li><button onClick={() => navigate('/browse-projects')} className="text-gray-400 hover:text-white transition-colors">Browse Projects</button></li>
+                <li><button onClick={handleContactClick} className="text-gray-400 hover:text-white transition-colors">Contact Us</button></li>
               </ul>
             </div>
-
-            {/* Get in Touch */}
             <div>
-              <h3 className="text-white font-semibold mb-3 sm:mb-4 text-base sm:text-lg">Get in Touch</h3>
-              <p className="text-white/70 text-sm sm:text-base mb-3 sm:mb-4 leading-relaxed">
+              <h3 className="text-white font-semibold mb-4">Get in Touch</h3>
+              <p className="text-gray-400 mb-4">
                 Ready to start your project? Contact us today!
               </p>
               <Button 
-                onClick={() => {
-                  const phoneNumber = "919137106851";
-                  const message = encodeURIComponent("Hello, I'd like to discuss a project with you!");
-                  window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
-                }}
-                className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white hover:from-blue-700 hover:to-cyan-500 text-sm sm:text-base px-5 sm:px-6 py-2.5 sm:py-3 w-full sm:w-auto"
+                onClick={handleContactClick}
+                className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white hover:from-blue-700 hover:to-cyan-500"
               >
                 WhatsApp Us
               </Button>
             </div>
           </div>
-
-          {/* Bottom Bar */}
-          <div className="border-t border-white/10 pt-5 sm:pt-6 text-center text-white/70 text-sm sm:text-base">
+          <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
             <p>&copy; {new Date().getFullYear()} ProjectKart. All rights reserved.</p>
           </div>
         </div>

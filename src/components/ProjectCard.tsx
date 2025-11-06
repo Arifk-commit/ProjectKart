@@ -12,6 +12,9 @@ interface ProjectCardProps {
   imageUrl?: string;
   whatsappNumber: string;
   className?: string;
+  price?: number;
+  minPrice?: number;
+  maxPrice?: number;
 }
 
 export const ProjectCard = ({ 
@@ -21,9 +24,35 @@ export const ProjectCard = ({
   technologies, 
   imageUrl,
   whatsappNumber,
-  className = ""
+  className = "",
+  price = 0,
+  minPrice = 0,
+  maxPrice = 0
 }: ProjectCardProps) => {
   const navigate = useNavigate();
+  
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(price);
+  };
+
+  const getPriceDisplay = () => {
+    // If both min and max price are set and different, show range
+    if (minPrice > 0 && maxPrice > 0 && minPrice !== maxPrice) {
+      return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
+    }
+    // If only min price is set
+    else if (minPrice > 0 && maxPrice === 0) {
+      return `From ${formatPrice(minPrice)}`;
+    }
+    // Otherwise show fixed price
+    else {
+      return formatPrice(price);
+    }
+  };
   
   const handleWhatsAppClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click when clicking WhatsApp button
@@ -62,9 +91,16 @@ export const ProjectCard = ({
         </div>
       )}
       <CardHeader className="pb-2 sm:pb-3 px-4 sm:px-6">
-        <CardTitle className="text-gray-900 group-hover:text-blue-600 transition-colors text-lg sm:text-xl line-clamp-2">
-          {title}
-        </CardTitle>
+        <div className="flex-col items-start justify-between gap-2">
+          <CardTitle className="text-gray-900 group-hover:text-blue-600 transition-colors text-lg sm:text-xl line-clamp-2 flex-1">
+            {title}
+          </CardTitle>
+          <div className="text-start mt-2 flex-shrink-0">
+            <div className="text-xl sm:text-2xl font-bold text-blue-600 whitespace-nowrap">
+              {getPriceDisplay()}
+            </div>
+          </div>
+        </div>
         <CardDescription className="text-gray-600 line-clamp-2 text-sm sm:text-base">
           {description}
         </CardDescription>
@@ -85,7 +121,7 @@ export const ProjectCard = ({
           <Button 
             onClick={handleViewDetails}
             variant="outline"
-            className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition-all font-semibold py-5 sm:py-6 rounded-xl text-sm sm:text-base touch-manipulation"
+            className="flex-1 border-blue-200 text-white hover:bg-blue-50 hover:text-blue-700 transition-all font-semibold py-5 sm:py-6 rounded-xl text-sm sm:text-base touch-manipulation"
           >
             <Eye className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
             <span className="hidden sm:inline">View Details</span>
