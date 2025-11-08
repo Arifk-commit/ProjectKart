@@ -189,26 +189,28 @@ export default function ProjectDetails() {
           <Button
             variant="ghost"
             onClick={() => {
-              navigate('/');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            className="text-black hover:bg-white/50 text-sm sm:text-base"
-          >
-            <ArrowLeft className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">Home</span>
-            <span className="sm:hidden">Home</span>
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => {
               navigate('/browse-projects');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             className="text-black hover:bg-white/50 text-sm sm:text-base"
           >
+            <ArrowLeft className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline">Browse All Projects</span>
             <span className="sm:hidden">All Projects</span>
           </Button>
+          <Button
+            variant="ghost"
+            onClick={() => {
+              navigate('/');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="text-black hover:bg-white/50 text-sm sm:text-base"
+          >
+            
+            <span className="hidden sm:inline">Home</span>
+            <span className="sm:hidden">Home</span>
+          </Button>
+          
         </div>
 
         {/* Project Details */}

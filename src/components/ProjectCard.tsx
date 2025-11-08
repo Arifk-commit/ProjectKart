@@ -92,7 +92,7 @@ export const ProjectCard = ({
       )}
       <CardHeader className="pb-2 sm:pb-3 px-4 sm:px-6">
         <div className="flex-col items-start justify-between gap-2">
-          <CardTitle className="text-gray-900 group-hover:text-blue-600 transition-colors text-lg sm:text-xl line-clamp-2 flex-1">
+          <CardTitle className="text-gray-900 group-hover:text-blue-600 transition-colors text-2xl  line-clamp-2 flex-1">
             {title}
           </CardTitle>
           <div className="text-start mt-2 flex-shrink-0">
