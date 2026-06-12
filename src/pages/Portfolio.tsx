@@ -4,6 +4,7 @@ import { ProjectCard } from "@/components/ProjectCard";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { HARDCODED_PROJECTS } from "@/data/hardcodedProjects";
 
 interface Project {
   id: string;
@@ -28,7 +29,6 @@ export default function Portfolio() {
 
   useEffect(() => {
     fetchProjects();
-    fetchSettings();
     checkAdminStatus();
 
     // Add scroll listener
@@ -42,49 +42,17 @@ export default function Portfolio() {
 
   const fetchProjects = async () => {
     try {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('published', true)
-        .order('display_order', { ascending: true })
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setProjects((data || []).map(project => ({
-        id: project.id,
-        title: project.title,
-        description: project.description,
-        technologies: Array.isArray(project.technologies) ? project.technologies.map(String) : [],
-        image_url: project.image_url,
-        category: project.category || 'Web Development',
-        price: project.price || 0,
-        min_price: project.min_price || 0,
-        max_price: project.max_price || 0,
-      })));
+      // Using hardcoded projects instead of database
+      setProjects(HARDCODED_PROJECTS);
+      setLoading(false);
     } catch (error: any) {
-      console.error('Error fetching projects:', error);
+      console.error('Error loading projects:', error);
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to load projects. Please try again later.",
       });
-    } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchSettings = async () => {
-    try {
-      const { data } = await supabase
-        .from('settings')
-        .select('whatsapp_number')
-        .single();
-
-      if (data) {
-        setWhatsappNumber(data.whatsapp_number);
-      }
-    } catch (error) {
-      console.error('Error fetching settings:', error);
     }
   };
 
