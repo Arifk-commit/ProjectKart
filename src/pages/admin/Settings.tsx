@@ -24,8 +24,21 @@ export default function Settings() {
   const { toast } = useToast();
 
   useEffect(() => {
+    checkAuth();
     fetchSettings();
   }, []);
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast({
+        variant: "destructive",
+        title: "Unauthorized",
+        description: "Please login to access this page.",
+      });
+      navigate('/admin/login');
+    }
+  };
 
   const fetchSettings = async () => {
     try {

@@ -25,6 +25,7 @@ interface Project {
   image_url?: string;
   published: boolean;
   created_at: string;
+  category?: string; // Make optional
 }
 
 export default function Dashboard() {
@@ -42,6 +43,11 @@ export default function Dashboard() {
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
+      toast({
+        variant: "destructive",
+        title: "Unauthorized",
+        description: "Please login to access admin panel.",
+      });
       navigate('/admin/login');
     }
   };
@@ -62,6 +68,7 @@ export default function Dashboard() {
         image_url: project.image_url,
         published: project.published,
         created_at: project.created_at,
+        category: project.category || 'Web Development',
       })));
     } catch (error: any) {
       toast({
@@ -204,7 +211,14 @@ export default function Dashboard() {
                 )}
                 <CardHeader>
                   <div className="flex justify-between items-start">
-                    <CardTitle className="text-foreground">{project.title}</CardTitle>
+                    <div className="flex-1">
+                      <CardTitle className="text-foreground">{project.title}</CardTitle>
+                      {project.category && (
+                        <Badge variant="outline" className="mt-2 text-xs">
+                          {project.category}
+                        </Badge>
+                      )}
+                    </div>
                     <Badge 
                       variant={project.published ? "default" : "secondary"}
                       className={project.published ? "bg-primary text-primary-foreground" : ""}
@@ -212,7 +226,7 @@ export default function Dashboard() {
                       {project.published ? "Published" : "Draft"}
                     </Badge>
                   </div>
-                  <CardDescription className="line-clamp-2 text-muted-foreground">
+                  <CardDescription className="line-clamp-2 text-muted-foreground mt-2">
                     {project.description}
                   </CardDescription>
                 </CardHeader>

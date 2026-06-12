@@ -100,6 +100,20 @@ export default function Login() {
 
     setLoading(true);
     try {
+      // Check if any users already exist
+      const { data: { users }, error: listError } = await supabase.auth.admin.listUsers();
+      
+      if (listError) {
+        // If we can't list users (which is expected for non-admin), just show a message
+        toast({
+          variant: "destructive",
+          title: "Signup Disabled",
+          description: "New account registration is currently disabled. Please contact the administrator.",
+        });
+        setLoading(false);
+        return;
+      }
+
       const redirectUrl = `${window.location.origin}/admin/dashboard`;
       const { error } = await supabase.auth.signUp({
         email: email.trim(),
@@ -122,7 +136,7 @@ export default function Login() {
       } else {
         toast({
           title: "Success!",
-          description: "Account created successfully. You can now login.",
+          description: "Account created successfully. Please check your email for verification.",
         });
       }
     } catch (error: any) {
