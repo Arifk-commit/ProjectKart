@@ -248,10 +248,10 @@ export default function BrowseProjects() {
             
             {/* Right: Home Button */}
             <Button
-              onClick={() => {
-                navigate('/');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
+              // onClick={() => {
+              //   window.location.href = 'https://projectkart.framer.website/';
+              // }}
+              onClick={() => navigate('/')}
               variant="ghost"
               size="sm"
               className="text-white hover:bg-white/20 whitespace-nowrap flex-shrink-0 px-3 sm:px-4 py-2 sm:py-2 text-sm sm:text-sm h-auto"
@@ -390,7 +390,7 @@ export default function BrowseProjects() {
             <div>
               <h3 className="text-white font-semibold mb-4">Quick Links</h3>
               <ul className="space-y-2">
-                <li><button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-colors">Home</button></li>
+                <li><button onClick={() => window.location.href = 'https://projectkart.framer.website/'} className="text-gray-400 hover:text-white transition-colors">Home</button></li>
                 <li><button onClick={() => navigate('/browse-projects')} className="text-gray-400 hover:text-white transition-colors">Browse Projects</button></li>
                 <li><button onClick={handleContactClick} className="text-gray-400 hover:text-white transition-colors">Contact Us</button></li>
               </ul>
