@@ -42,7 +42,7 @@ export const ProjectCard = ({
 
   return (
     <Card 
-      className={`group overflow-hidden border-0 bg-white hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer touch-manipulation ${className}`}
+      className={`group overflow-hidden transition-all duration-300 transform hover:-translate-y-2 cursor-pointer touch-manipulation ${className || 'border-0 bg-white hover:shadow-2xl'}`}
       onClick={handleViewDetails}
     >
       {imageUrl && (
