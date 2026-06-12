@@ -190,7 +190,18 @@ const Index = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
               {filteredProjects.map((project) => (
-                <ProjectCard key={project.id} project={project} />
+                <ProjectCard 
+                  key={project.id}
+                  id={project.id}
+                  title={project.title}
+                  description={project.description}
+                  technologies={project.technologies}
+                  imageUrl={project.image_url}
+                  whatsappNumber="919137106851"
+                  price={project.price}
+                  minPrice={project.min_price}
+                  maxPrice={project.max_price}
+                />
               ))}
             </div>
 

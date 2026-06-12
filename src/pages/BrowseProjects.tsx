@@ -23,19 +23,14 @@ interface Project {
 
 const PROJECT_CATEGORIES = [
   "All Categories",
-  "Web Development",
-  "Mobile App",
-  "Machine Learning",
+  "Artificial Intelligence",
   "Data Science",
-  "AI/ML",
-  "Blockchain",
-  "Game Development",
-  "Desktop Application",
-  "DevOps/Cloud",
   "Cybersecurity",
   "IoT",
+  "Healthcare",
+  "Finance",
   "E-commerce",
-  "Other"
+  "Software Development"
 ];
 
 export default function BrowseProjects() {
@@ -59,7 +54,7 @@ export default function BrowseProjects() {
     // Filter by categories
     if (selectedCategories.length > 0) {
       filtered = filtered.filter(project => 
-        selectedCategories.includes(project.category || 'Web Development')
+        selectedCategories.includes(project.category || 'Artificial Intelligence')
       );
     }
 

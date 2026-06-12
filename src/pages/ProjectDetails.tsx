@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ArrowLeft, MessageCircle, Calendar, Tag } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { HARDCODED_PROJECTS } from "@/data/hardcodedProjects";
 
 interface ProjectDetails {
   id: string;
@@ -33,82 +34,63 @@ export default function ProjectDetails() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+    
     if (id) {
       fetchProjectDetails();
-      fetchSettings();
     }
   }, [id]);
 
   const fetchProjectDetails = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('id', id)
-        .eq('published', true)
-        .single();
-
-      if (error) throw error;
-
-      if (data) {
-        // Handle both new image_urls array and old single image_url
-        let imageUrls: string[] = [];
-        
-        if (data.image_urls && Array.isArray(data.image_urls) && data.image_urls.length > 0) {
-          // New format: multiple images
-          imageUrls = data.image_urls.map(String).filter(url => url && url.trim() !== '');
-        } else if (data.image_url && data.image_url.trim() !== '') {
-          // Old format: single image
-          imageUrls = [data.image_url];
-        }
-        
-        setProject({
-          id: data.id,
-          title: data.title,
-          description: data.description,
-          technologies: Array.isArray(data.technologies) ? data.technologies.map(String) : [],
-          image_url: data.image_url,
-          image_urls: imageUrls,
-          category: data.category || 'Web Development',
-          created_at: data.created_at,
-          updated_at: data.updated_at,
-          price: data.price || 0,
-          min_price: data.min_price || 0,
-          max_price: data.max_price || 0,
-        });
+      
+      // Find project from hardcoded data
+      const foundProject = HARDCODED_PROJECTS.find(p => p.id === id);
+      
+      if (!foundProject) {
+        throw new Error('Project not found');
       }
+
+      // Handle both new image_urls array and old single image_url
+      let imageUrls: string[] = [];
+      
+      if (foundProject.image_url && foundProject.image_url.trim() !== '') {
+        imageUrls = [foundProject.image_url];
+      }
+      
+      setProject({
+        id: foundProject.id,
+        title: foundProject.title,
+        description: foundProject.description,
+        technologies: foundProject.technologies,
+        image_url: foundProject.image_url,
+        image_urls: imageUrls,
+        category: foundProject.category || 'Artificial Intelligence',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        price: foundProject.price || 0,
+        min_price: foundProject.min_price || 0,
+        max_price: foundProject.max_price || 0,
+      });
+      
+      setLoading(false);
     } catch (error: any) {
-      console.error('Error fetching project details:', error);
+      console.error('Error loading project details:', error);
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to load project details. Please try again later.",
       });
       navigate('/browse-projects');
-    } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchSettings = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('settings')
-        .select('whatsapp_number')
-        .single();
-
-      if (error) throw error;
-      setWhatsappNumber(data?.whatsapp_number || "919137106851");
-    } catch (error) {
-      console.error('Error fetching settings:', error);
-      setWhatsappNumber("919137106851");
     }
   };
 
   const handleWhatsAppClick = () => {
     if (!project) return;
-    const phoneNumber = whatsappNumber || "919137106851";
+    const phoneNumber = "919137106851";
     const message = encodeURIComponent(`Hello, I'm interested in this project: ${project.title}`);
     const url = `https://wa.me/${phoneNumber}?text=${message}`;
     window.open(url, '_blank');
