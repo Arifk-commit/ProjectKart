@@ -13,6 +13,8 @@ import ProjectForm from "./pages/admin/ProjectForm";
 import Settings from "./pages/admin/Settings";
 import NotFound from "./pages/NotFound";
 
+import { SpeedInsights } from "@vercel/speed-insights/react"
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -51,6 +53,7 @@ const App = () => (
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
+     <SpeedInsights />
   </QueryClientProvider>
 );
 
