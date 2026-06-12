@@ -16,6 +16,12 @@ const projectSchema = z.object({
   description: z.string().trim().min(1, "Description is required").max(5000, "Description is too long (max 5000 characters)"),
   technologies: z.string().trim().min(1, "Technologies are required"),
   category: z.string().optional(), // Make category optional
+  price: z.number().min(0, "Price must be positive").max(99999999.99, "Price too high"),
+  minPrice: z.number().min(0, "Min price must be positive").max(99999999.99, "Price too high"),
+  maxPrice: z.number().min(0, "Max price must be positive").max(99999999.99, "Price too high"),
+}).refine((data) => data.maxPrice >= data.minPrice, {
+  message: "Max price must be greater than or equal to min price",
+  path: ["maxPrice"],
 });
 
 const PROJECT_CATEGORIES = [
@@ -50,6 +56,9 @@ export default function ProjectForm() {
   const [published, setPublished] = useState(false);
   const [category, setCategory] = useState("Web Development");
   const [displayOrder, setDisplayOrder] = useState(0);
+  const [price, setPrice] = useState(0);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(0);
 
   useEffect(() => {
     checkAuth();
@@ -100,6 +109,9 @@ export default function ProjectForm() {
         setCategory(data.category);
       }
       setDisplayOrder(data.display_order || 0);
+      setPrice(data.price || 0);
+      setMinPrice(data.min_price || 0);
+      setMaxPrice(data.max_price || 0);
     } catch (error: any) {
       console.error('Fetch project error:', error);
       toast({
@@ -218,6 +230,9 @@ export default function ProjectForm() {
       description,
       technologies,
       category,
+      price,
+      minPrice,
+      maxPrice,
     });
 
     if (!validation.success) {
@@ -245,6 +260,9 @@ export default function ProjectForm() {
         published,
         category,
         display_order: displayOrder,
+        price,
+        min_price: minPrice,
+        max_price: maxPrice,
       };
 
       if (isEditing) {
@@ -364,6 +382,70 @@ export default function ProjectForm() {
                 />
                 <p className="text-xs text-muted-foreground">
                   Lower numbers appear first. Use this to control which projects are displayed at the top (e.g., 1, 2, 3...). Default is 0.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="price">Fixed Price (INR)</Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₹</span>
+                  <Input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="99999999.99"
+                    value={price}
+                    onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
+                    placeholder="0.00"
+                    className="bg-input border-border pl-7"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Set a fixed price, or use price range below. Use 0 for free projects.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Price Range (INR)</Label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="minPrice" className="text-xs text-muted-foreground">Min Price</Label>
+                    <div className="relative mt-1">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₹</span>
+                      <Input
+                        id="minPrice"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        max="99999999.99"
+                        value={minPrice}
+                        onChange={(e) => setMinPrice(parseFloat(e.target.value) || 0)}
+                        placeholder="499.00"
+                        className="bg-input border-border pl-7"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="maxPrice" className="text-xs text-muted-foreground">Max Price</Label>
+                    <div className="relative mt-1">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₹</span>
+                      <Input
+                        id="maxPrice"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        max="99999999.99"
+                        value={maxPrice}
+                        onChange={(e) => setMaxPrice(parseFloat(e.target.value) || 0)}
+                        placeholder="3999.00"
+                        className="bg-input border-border pl-7"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Display price range like "₹499 - ₹3,999". Leave both at 0 to use fixed price above.
                 </p>
               </div>
 

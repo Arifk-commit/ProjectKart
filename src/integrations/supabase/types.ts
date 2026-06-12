@@ -27,6 +27,9 @@ export type Database = {
           updated_at: string | null
           category: string
           display_order: number
+          price: number
+          min_price: number
+          max_price: number
         }
         Insert: {
           created_at?: string | null
@@ -40,6 +43,9 @@ export type Database = {
           updated_at?: string | null
           category?: string
           display_order?: number
+          price?: number
+          min_price?: number
+          max_price?: number
         }
         Update: {
           created_at?: string | null
@@ -53,6 +59,9 @@ export type Database = {
           updated_at?: string | null
           category?: string
           display_order?: number
+          price?: number
+          min_price?: number
+          max_price?: number
         }
         Relationships: []
       }

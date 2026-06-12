@@ -18,6 +18,9 @@ interface ProjectDetails {
   category?: string;
   created_at: string;
   updated_at: string;
+  price?: number;
+  min_price?: number;
+  max_price?: number;
 }
 
 export default function ProjectDetails() {
@@ -70,6 +73,9 @@ export default function ProjectDetails() {
           category: data.category || 'Web Development',
           created_at: data.created_at,
           updated_at: data.updated_at,
+          price: data.price || 0,
+          min_price: data.min_price || 0,
+          max_price: data.max_price || 0,
         });
       }
     } catch (error: any) {
@@ -115,6 +121,33 @@ export default function ProjectDetails() {
       month: 'long', 
       day: 'numeric' 
     });
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(price);
+  };
+
+  const getPriceDisplay = () => {
+    if (!project) return '';
+    
+    const { price = 0, min_price = 0, max_price = 0 } = project;
+    
+    // If both min and max price are set and different, show range
+    if (min_price > 0 && max_price > 0 && min_price !== max_price) {
+      return `${formatPrice(min_price)} - ${formatPrice(max_price)}`;
+    }
+    // If only min price is set
+    else if (min_price > 0 && max_price === 0) {
+      return `From ${formatPrice(min_price)}`;
+    }
+    // Otherwise show fixed price
+    else {
+      return formatPrice(price);
+    }
   };
 
   if (loading) {
@@ -182,12 +215,14 @@ export default function ProjectDetails() {
         <div className="max-w-4xl mx-auto">
           {/* Project Images - Carousel */}
           {project.image_urls && project.image_urls.length > 0 ? (
-            <div className="relative aspect-video overflow-hidden rounded-lg sm:rounded-xl shadow-xl sm:shadow-2xl mb-4 sm:mb-6 lg:mb-8 bg-gradient-to-br from-blue-100 to-cyan-100">
-              <img 
-                src={project.image_urls[currentImageIndex]} 
-                alt={`${project.title} - Image ${currentImageIndex + 1}`}
-                className="w-full h-full object-cover"
-              />
+            <div className="relative w-full rounded-lg sm:rounded-xl shadow-xl sm:shadow-2xl mb-4 sm:mb-6 lg:mb-8 bg-gradient-to-br from-blue-100 to-cyan-100 overflow-hidden">
+              <div className="aspect-video w-full">
+                <img 
+                  src={project.image_urls[currentImageIndex]} 
+                  alt={`${project.title} - Image ${currentImageIndex + 1}`}
+                  className="w-full h-full object-contain bg-white"
+                />
+              </div>
               
               {/* Image Navigation */}
               {project.image_urls.length > 1 && (
@@ -195,7 +230,7 @@ export default function ProjectDetails() {
                   {/* Previous Button */}
                   <button
                     onClick={() => setCurrentImageIndex((prev) => (prev === 0 ? project.image_urls!.length - 1 : prev - 1))}
-                    className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 sm:p-3 rounded-full transition-all"
+                    className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 sm:p-3 rounded-full transition-all z-10"
                   >
                     <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -205,7 +240,7 @@ export default function ProjectDetails() {
                   {/* Next Button */}
                   <button
                     onClick={() => setCurrentImageIndex((prev) => (prev === project.image_urls!.length - 1 ? 0 : prev + 1))}
-                    className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 sm:p-3 rounded-full transition-all"
+                    className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 sm:p-3 rounded-full transition-all z-10"
                   >
                     <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -213,7 +248,7 @@ export default function ProjectDetails() {
                   </button>
                   
                   {/* Image Indicators */}
-                  <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2">
+                  <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2 z-10">
                     {project.image_urls.map((_, index) => (
                       <button
                         key={index}
@@ -226,7 +261,7 @@ export default function ProjectDetails() {
                   </div>
                   
                   {/* Image Counter */}
-                  <div className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-black/50 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
+                  <div className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-black/50 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm z-10">
                     {currentImageIndex + 1} / {project.image_urls.length}
                   </div>
                 </>
@@ -242,9 +277,17 @@ export default function ProjectDetails() {
 
           {/* Project Header */}
           <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight">
-              {project.title}
-            </h1>
+            <div className="flex items-start justify-between gap-4 mb-3 sm:mb-4">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight flex-1">
+                {project.title}
+              </h1>
+              <div className="text-right flex-shrink-0">
+                <div className="text-sm sm:text-base text-gray-600 mb-1">Price</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent whitespace-nowrap">
+                  {getPriceDisplay()}
+                </div>
+              </div>
+            </div>
             
             <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-gray-600 mb-4 sm:mb-6">
               {project.category && (

@@ -12,6 +12,9 @@ interface Project {
   technologies: string[];
   image_url?: string;
   category?: string;
+  price?: number;
+  min_price?: number;
+  max_price?: number;
 }
 
 export default function Portfolio() {
@@ -54,6 +57,9 @@ export default function Portfolio() {
         technologies: Array.isArray(project.technologies) ? project.technologies.map(String) : [],
         image_url: project.image_url,
         category: project.category || 'Web Development',
+        price: project.price || 0,
+        min_price: project.min_price || 0,
+        max_price: project.max_price || 0,
       })));
     } catch (error: any) {
       console.error('Error fetching projects:', error);
@@ -123,7 +129,11 @@ export default function Portfolio() {
       <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/5 border-b border-white/10 transition-all duration-300">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <img src="/logo-black.svg" alt="ProjectKart Logo" className="h-10 w-10" />
+            <img 
+              src={isScrolled ? "/logo-black.svg" : "/logo-white.svg"} 
+              alt="ProjectKart Logo" 
+              className="h-10 w-10 transition-all duration-300" 
+            />
             <span className={`font-bold text-xl transition-colors ${
               isScrolled ? 'text-gray-900' : 'text-white'
             }`}>ProjectKart</span>
@@ -180,15 +190,14 @@ export default function Portfolio() {
             <Button 
               onClick={scrollToProjects}
               size="lg"
-              className="bg-white text-blue-600 hover:bg-white/90 text-base px-6 py-5 h-auto font-semibold rounded-full shadow-xl hover:shadow-2xl transition-all"
+              className="bg-white text-black hover:bg-white hover:text-black text-base px-6 py-3 h-auto font-semibold rounded-full shadow-xl hover:shadow-2xl transition-all hover:scale-105"
             >
               Browse Projects
             </Button>
             <Button 
               onClick={handleContactClick}
               size="lg"
-              variant="outline"
-              className="border-2 border-white text-white hover:bg-white/20 text-base px-6 py-5 h-auto font-semibold rounded-full backdrop-blur-sm"
+              className="bg-white text-black hover:bg-white hover:text-black text-base px-6 py-3 h-auto font-semibold rounded-full shadow-xl hover:shadow-2xl transition-all hover:scale-105"
             >
               Contact
             </Button>
@@ -239,6 +248,9 @@ export default function Portfolio() {
                       technologies={project.technologies}
                       imageUrl={project.image_url}
                       whatsappNumber={whatsappNumber}
+                      price={project.price}
+                      minPrice={project.min_price}
+                      maxPrice={project.max_price}
                       className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 border border-blue-100 shadow-lg"
                     />
                   </div>
@@ -267,8 +279,8 @@ export default function Portfolio() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <img src="/logo-black.svg" alt="ProjectKart Logo" className="h-10 w-10 brightness-0 invert" />
-                <span className="text-white font-bold text-lg">ProjectKart</span>
+                <img src="/logo-white.svg" alt="ProjectKart Logo" className="h-10 w-10" />
+                <span className="text-white font-bold text-xl">ProjectKart</span>
               </div>
               <p className="text-gray-400">
                 Professional ready-made projects and custom solutions for your business needs.

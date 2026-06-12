@@ -27,6 +27,9 @@ interface Project {
   created_at: string;
   category?: string; // Make optional
   display_order?: number;
+  price?: number;
+  min_price?: number;
+  max_price?: number;
 }
 
 export default function Dashboard() {
@@ -72,6 +75,9 @@ export default function Dashboard() {
         created_at: project.created_at,
         category: project.category || 'Web Development',
         display_order: project.display_order || 0,
+        price: project.price || 0,
+        min_price: project.min_price || 0,
+        max_price: project.max_price || 0,
       })));
     } catch (error: any) {
       toast({
@@ -136,6 +142,31 @@ export default function Dashboard() {
         title: "Error",
         description: "Failed to update project status.",
       });
+    }
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(price);
+  };
+
+  const getPriceDisplay = (project: Project) => {
+    const { price = 0, min_price = 0, max_price = 0 } = project;
+    
+    // If both min and max price are set and different, show range
+    if (min_price > 0 && max_price > 0 && min_price !== max_price) {
+      return `${formatPrice(min_price)} - ${formatPrice(max_price)}`;
+    }
+    // If only min price is set
+    else if (min_price > 0 && max_price === 0) {
+      return `From ${formatPrice(min_price)}`;
+    }
+    // Otherwise show fixed price
+    else {
+      return formatPrice(price);
     }
   };
 
@@ -216,7 +247,7 @@ export default function Dashboard() {
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <CardTitle className="text-foreground">{project.title}</CardTitle>
-                      <div className="flex gap-2 mt-2">
+                      <div className="flex gap-2 mt-2 flex-wrap">
                         {project.category && (
                           <Badge variant="outline" className="text-xs">
                             {project.category}
@@ -227,6 +258,9 @@ export default function Dashboard() {
                             Priority: {project.display_order}
                           </Badge>
                         )}
+                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-300 font-semibold">
+                          {getPriceDisplay(project)}
+                        </Badge>
                       </div>
                     </div>
                     <Badge 
