@@ -78,6 +78,7 @@ export default function BrowseProjects() {
         .from('projects')
         .select('*')
         .eq('published', true)
+        .order('display_order', { ascending: true })
         .order('created_at', { ascending: false });
 
       if (error) throw error;

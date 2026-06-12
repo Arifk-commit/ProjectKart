@@ -49,6 +49,7 @@ export default function ProjectForm() {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [published, setPublished] = useState(false);
   const [category, setCategory] = useState("Web Development");
+  const [displayOrder, setDisplayOrder] = useState(0);
 
   useEffect(() => {
     checkAuth();
@@ -98,6 +99,7 @@ export default function ProjectForm() {
       if (data.category) {
         setCategory(data.category);
       }
+      setDisplayOrder(data.display_order || 0);
     } catch (error: any) {
       console.error('Fetch project error:', error);
       toast({
@@ -242,6 +244,7 @@ export default function ProjectForm() {
         image_urls: imageUrls,
         published,
         category,
+        display_order: displayOrder,
       };
 
       if (isEditing) {
@@ -346,6 +349,21 @@ export default function ProjectForm() {
                 </select>
                 <p className="text-xs text-muted-foreground">
                   Select the primary domain/category for this project
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="displayOrder">Display Priority</Label>
+                <Input
+                  id="displayOrder"
+                  type="number"
+                  value={displayOrder}
+                  onChange={(e) => setDisplayOrder(parseInt(e.target.value) || 0)}
+                  placeholder="0"
+                  className="bg-input border-border"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Lower numbers appear first. Use this to control which projects are displayed at the top (e.g., 1, 2, 3...). Default is 0.
                 </p>
               </div>
 

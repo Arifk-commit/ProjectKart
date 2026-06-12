@@ -141,7 +141,7 @@ export default function ProjectDetails() {
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Project not found</h2>
           <Button onClick={() => navigate('/browse-projects')} className="text-sm sm:text-base">
             <ArrowLeft className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-            Back to Projects
+            Browse All Projects
           </Button>
         </div>
       </div>
@@ -152,7 +152,7 @@ export default function ProjectDetails() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Navigation Buttons */}
-        <div className="flex gap-2 sm:gap-3 mb-4 sm:mb-6 lg:mb-8">
+        <div className="flex justify-between gap-2 sm:gap-3 mb-4 sm:mb-6 lg:mb-8">
           <Button
             variant="ghost"
             onClick={() => {
@@ -173,7 +173,7 @@ export default function ProjectDetails() {
             }}
             className="text-black hover:bg-white/50 text-sm sm:text-base"
           >
-            <span className="hidden sm:inline">Back to Projects</span>
+            <span className="hidden sm:inline">Browse All Projects</span>
             <span className="sm:hidden">Projects</span>
           </Button>
         </div>
