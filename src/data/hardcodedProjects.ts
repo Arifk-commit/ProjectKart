@@ -1,6 +1,17 @@
 // Hardcoded projects data - no database needed
 export const HARDCODED_PROJECTS = [
   {
+    id: '0',
+    title: 'Get Custom Project',
+    description: "Need a project tailored to your specific requirements? Get Custom Projects offers personalized software solutions designed to match your unique needs. Whether it's a web application, mobile app, AI/ML project, academic project, MERN stack application, automation tool, or business solution, we develop high-quality projects with clean code, documentation, deployment support, and post-delivery assistance. Share your requirements, and we'll transform your idea into a fully functional project.",
+    technologies: [],
+    image_url: '/mobile ui.jpg',
+    category: 'Other',
+    price: 0,
+    min_price: 499,
+    max_price: 4999,
+  },
+  {
     id: '1',
     title: 'AI-Powered Customer Support Chatbot',
     description: 'Intelligent chatbot with natural language processing capabilities. Handles customer queries, provides instant responses, and learns from interactions.',
