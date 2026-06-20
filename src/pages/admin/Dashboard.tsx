@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -45,40 +44,18 @@ export default function Dashboard() {
   }, []);
 
   const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      toast({
-        variant: "destructive",
-        title: "Unauthorized",
-        description: "Please login to access admin panel.",
-      });
-      navigate('/admin/login');
-    }
+    // Auth disabled - no database
+    toast({
+      title: "Note",
+      description: "Admin features are disabled. Showing hardcoded projects only.",
+    });
   };
 
   const fetchProjects = async () => {
     try {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .order('display_order', { ascending: true })
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setProjects((data || []).map(project => ({
-        id: project.id,
-        title: project.title,
-        description: project.description,
-        technologies: Array.isArray(project.technologies) ? project.technologies.map(String) : [],
-        image_url: project.image_url,
-        published: project.published,
-        created_at: project.created_at,
-        category: project.category || 'Web Development',
-        display_order: project.display_order || 0,
-        price: project.price || 0,
-        min_price: project.min_price || 0,
-        max_price: project.max_price || 0,
-      })));
+      // Using hardcoded projects instead of database
+      setProjects([]);
+      setLoading(false);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -91,7 +68,6 @@ export default function Dashboard() {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
     navigate('/admin/login');
   };
 
@@ -99,35 +75,11 @@ export default function Dashboard() {
     if (!deleteId) return;
 
     try {
-      // Check if user is authenticated
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "You must be logged in to delete projects.",
-        });
-        navigate('/admin/login');
-        return;
-      }
-
-      const { error } = await supabase
-        .from('projects')
-        .delete()
-        .eq('id', deleteId);
-
-      if (error) {
-        console.error('Delete error:', error);
-        throw error;
-      }
-
       toast({
-        title: "Success",
-        description: "Project deleted successfully.",
+        variant: "destructive",
+        title: "Database Disabled",
+        description: "Project deletion is disabled without a database.",
       });
-      
-      // Refresh projects list after successful deletion
-      await fetchProjects();
     } catch (error: any) {
       console.error('Delete failed:', error);
       toast({
@@ -142,18 +94,11 @@ export default function Dashboard() {
 
   const togglePublish = async (id: string, currentStatus: boolean) => {
     try {
-      const { error } = await supabase
-        .from('projects')
-        .update({ published: !currentStatus })
-        .eq('id', id);
-
-      if (error) throw error;
-
       toast({
-        title: "Success",
-        description: `Project ${!currentStatus ? 'published' : 'unpublished'} successfully.`,
+        variant: "destructive",
+        title: "Database Disabled",
+        description: "Cannot update project status without a database.",
       });
-      fetchProjects();
     } catch (error: any) {
       toast({
         variant: "destructive",

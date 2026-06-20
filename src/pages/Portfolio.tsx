@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { ProjectCard } from "@/components/ProjectCard";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -29,7 +28,6 @@ export default function Portfolio() {
 
   useEffect(() => {
     fetchProjects();
-    checkAdminStatus();
 
     // Add scroll listener
     const handleScroll = () => {
@@ -53,16 +51,6 @@ export default function Portfolio() {
         description: "Failed to load projects. Please try again later.",
       });
       setLoading(false);
-    }
-  };
-
-  const checkAdminStatus = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAdmin(!!session);
-    } catch (error) {
-      console.error('Error checking admin status:', error);
-      setIsAdmin(false);
     }
   };
 

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -68,50 +67,23 @@ export default function ProjectForm() {
   }, [id]);
 
   const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      toast({
-        variant: "destructive",
-        title: "Unauthorized",
-        description: "Please login to access this page.",
-      });
-      navigate('/admin/login');
-    }
+    // Auth check disabled - no database
+    // In a real app with authentication, you would check session here
+    toast({
+      title: "Note",
+      description: "Admin features are currently disabled. Using hardcoded data only.",
+    });
   };
 
   const fetchProject = async () => {
     try {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-
-      setTitle(data.title);
-      setDescription(data.description);
-      setTechnologies(Array.isArray(data.technologies) ? data.technologies.join(', ') : '');
-      setImageUrl(data.image_url || '');
-      
-      // Handle both new image_urls array and old single image_url
-      let urls: string[] = [];
-      if (data.image_urls && Array.isArray(data.image_urls) && data.image_urls.length > 0) {
-        urls = data.image_urls.map(String).filter(url => url && url.trim() !== '');
-      } else if (data.image_url && data.image_url.trim() !== '') {
-        urls = [data.image_url];
-      }
-      setImageUrls(urls);
-      
-      setPublished(data.published);
-      // Only set category if it exists in the data
-      if (data.category) {
-        setCategory(data.category);
-      }
-      setDisplayOrder(data.display_order || 0);
-      setPrice(data.price || 0);
-      setMinPrice(data.min_price || 0);
-      setMaxPrice(data.max_price || 0);
+      // Database queries disabled - using hardcoded data only
+      toast({
+        variant: "destructive",
+        title: "Database Disabled",
+        description: "Project editing is disabled. Using hardcoded projects only.",
+      });
+      navigate('/admin/dashboard');
     } catch (error: any) {
       console.error('Fetch project error:', error);
       toast({
@@ -154,26 +126,15 @@ export default function ProjectForm() {
     }
 
     setUploading(true);
-    const uploadedUrls: string[] = [];
-
+    
     try {
+      // Create local blob URLs for images since we don't have database
+      const uploadedUrls: string[] = [];
+      
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-        const filePath = `${fileName}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from('project-images')
-          .upload(filePath, file);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('project-images')
-          .getPublicUrl(filePath);
-
-        uploadedUrls.push(publicUrl);
+        const blobUrl = URL.createObjectURL(file);
+        uploadedUrls.push(blobUrl);
       }
 
       setImageUrls([...imageUrls, ...uploadedUrls]);
@@ -184,13 +145,13 @@ export default function ProjectForm() {
 
       toast({
         title: "Success",
-        description: `${uploadedUrls.length} image(s) uploaded successfully.`,
+        description: `${uploadedUrls.length} image(s) loaded (local only - no database).`,
       });
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Upload failed",
-        description: error.message || "Failed to upload images.",
+        description: error.message || "Failed to load images.",
       });
     } finally {
       setUploading(false);
@@ -246,43 +207,10 @@ export default function ProjectForm() {
 
     setLoading(true);
     try {
-      const techArray = technologies
-        .split(',')
-        .map(t => t.trim())
-        .filter(t => t.length > 0);
-
-      const projectData = {
-        title: title.trim(),
-        description: description.trim(),
-        technologies: techArray,
-        image_url: imageUrls.length > 0 ? imageUrls[0] : null,
-        image_urls: imageUrls,
-        published,
-        category,
-        display_order: displayOrder,
-        price,
-        min_price: minPrice,
-        max_price: maxPrice,
-      };
-
-      if (isEditing) {
-        const { error } = await supabase
-          .from('projects')
-          .update(projectData)
-          .eq('id', id);
-
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('projects')
-          .insert([projectData]);
-
-        if (error) throw error;
-      }
-
       toast({
-        title: "Success",
-        description: `Project ${isEditing ? 'updated' : 'created'} successfully.`,
+        variant: "destructive",
+        title: "Database Disabled",
+        description: "Project creation/editing is disabled. No database available.",
       });
       navigate('/admin/dashboard');
     } catch (error: any) {

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,26 +28,17 @@ export default function Settings() {
   }, []);
 
   const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      toast({
-        variant: "destructive",
-        title: "Unauthorized",
-        description: "Please login to access this page.",
-      });
-      navigate('/admin/login');
-    }
+    // Auth check disabled - no database
+    toast({
+      title: "Note",
+      description: "Settings are read-only without a database.",
+    });
   };
 
   const fetchSettings = async () => {
     try {
-      const { data, error } = await supabase
-        .from('settings')
-        .select('whatsapp_number')
-        .single();
-
-      if (error) throw error;
-      setWhatsappNumber(data?.whatsapp_number || '');
+      // Database queries disabled - using defaults only
+      setWhatsappNumber('919137106851');
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -74,30 +64,10 @@ export default function Settings() {
 
     setLoading(true);
     try {
-      // Get the first settings record
-      const { data: existingSettings } = await supabase
-        .from('settings')
-        .select('id')
-        .single();
-
-      if (existingSettings) {
-        const { error } = await supabase
-          .from('settings')
-          .update({ whatsapp_number: whatsappNumber.trim() })
-          .eq('id', existingSettings.id);
-
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('settings')
-          .insert([{ whatsapp_number: whatsappNumber.trim() }]);
-
-        if (error) throw error;
-      }
-
       toast({
-        title: "Success",
-        description: "WhatsApp number updated successfully.",
+        variant: "destructive",
+        title: "Database Disabled",
+        description: "Settings cannot be saved without a database.",
       });
     } catch (error: any) {
       toast({
